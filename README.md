@@ -24,3 +24,4 @@ A project coded by Benny Nottonson using Python
 
 ## Usage/Examples
 
+![Example Image](https://user-images.githubusercontent.com/112336374/203434791-176e5cde-fb14-4086-bdc1-1173d1450231.png)
