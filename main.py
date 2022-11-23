@@ -24,7 +24,7 @@ def processImage(image: Image) -> Image:
 
 def drawImage(name: str, numLine: str, backImage: Image, smallImage: Image, img: Image, fonts: tuple) -> Image:
     """Draws the card to the image, along with the text"""
-    helvetica, helveticaSmall, helveticaBold = fonts
+    helvetica, helveticaSmall, helveticaBold, majorMonoFront, majorMonoBack = fonts
     img.paste(backImage, (0, 0))
     draw = ImageDraw.Draw(img)
     img.paste(smallImage, (310, 255))
@@ -37,24 +37,33 @@ def drawImage(name: str, numLine: str, backImage: Image, smallImage: Image, img:
     draw.text((515, 584), "©", font=helveticaSmall, fill=(122, 122, 122))
     draw.text((336, 618), numLine, font=helvetica, fill=(122, 122, 122))
     draw.text((336, 646), name, font=helvetica, fill=(122, 122, 122))
+    num1, num2 = numLine.split(" - ")
+    num2 = num2.split(" ")[0]
+    textImage = Image.new('RGBA', (960, 960), color=(255, 255, 255, 0))
+    textDraw = ImageDraw.Draw(textImage)
+    textDraw.text(((960 - majorMonoBack.getlength(num1)) / 2, 335), num1, font=majorMonoBack, fill=(255, 255, 255, 115))
+    textDraw.text(((960 - majorMonoBack.getlength(num1)) / 2 + 1, 335), num1, font=majorMonoBack, fill=(255, 255, 255, 115))
+    textDraw.text(((960 - majorMonoBack.getlength(num1)) / 2 - 1, 335), num1, font=majorMonoBack, fill=(255, 255, 255, 115))
+    textDraw.text(((960 - majorMonoFront.getlength(num2)) / 2, 375), num2, font=majorMonoFront, fill=(255, 255, 255, 255))
+    textDraw.text(((960 - majorMonoFront.getlength(num2)) / 2 + 3, 375), num2, font=majorMonoFront, fill=(255, 255, 255, 255))
+    textDraw.text(((960 - majorMonoFront.getlength(num2)) / 2 - 3, 375), num2, font=majorMonoFront, fill=(255, 255, 255, 255))
+    img = img.convert("RGBA")
+    textImage = textImage.convert("RGBA")
+    img = Image.alpha_composite(img, textImage)
     return img
 
 
 def createImage(name: str, numLine: str, image: Image) -> None:
     """Creates the image and displays it to the screen"""
-    if name == "" or numLine == "" or image is None:
-        return
-    elif not (name.isalpha() or name.isalnum()):
-        return
-    elif not (numLine.isalpha() or numLine.isalnum()):
-        return
     global finalImageHolder, finalImage
     helvetica = ImageFont.truetype("venv/fonts/helveticaneue.ttf", 24)
     helveticaSmall = ImageFont.truetype("venv/fonts/helveticaneue.ttf", 8)
     helveticaBold = ImageFont.truetype("venv/fonts/HelveticaNeue Bold.ttf", 36)
+    majorMonoFront = ImageFont.truetype("venv/fonts/MajorMonoDisplay-Regular.ttf", 90)
+    majorMonoBack = ImageFont.truetype("venv/fonts/MajorMonoDisplay-Regular.ttf", 160)
     backImage, smallImage = processImage(image)
     img = Image.new('RGB', (960, 960), color=(0, 0, 0))
-    img = drawImage(name, numLine, backImage, smallImage, img, (helvetica, helveticaSmall, helveticaBold))
+    img = drawImage(name, numLine, backImage, smallImage, img, (helvetica, helveticaSmall, helveticaBold, majorMonoFront, majorMonoBack))
     finalImage = img
     phScaled = ImageTk.PhotoImage(img.resize((250, 250)))
     finalImageHolder.grid_forget()
